@@ -32,6 +32,8 @@ from pathlib import Path
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
+import numpy as np
+import pdb
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -146,7 +148,9 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
             imc = im0.copy() if save_crop else im0  # for save_crop
             annotator = Annotator(im0, line_width=line_thickness, example=str(names))
+            view_det = False
             if len(det):
+                view_det = True
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(im.shape[2:], det[:, :4], im0.shape).round()
 
@@ -172,9 +176,18 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
             # Stream results
             im0 = annotator.result()
-            if view_img:
-                cv2.imshow(str(p), im0)
-                cv2.waitKey(1)  # 1 millisecond
+            if view_img and view_det:
+                #pdb.set_trace()
+                #cv2.imshow(str(p), np.array(im0, dtype=np.uint8) )
+                #cv2.imshow(str(p), im0 )
+                cv2.imshow('yolov5x', im0)
+                key = cv2.waitKey(0)  # 1 millisecon
+                #key = cv2.waitKey(1)  # 1 millisecon
+                if key & 0xff == ord('q'):
+                    break
+                cv2.destroyWindow('yolov5x')
+                #pdb.set_trace()
+                #cv2.destroyAllWindows()
 
             # Save results (image with detections)
             if save_img:
@@ -201,6 +214,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
     # Print results
     t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
+    pdb.set_trace()
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
