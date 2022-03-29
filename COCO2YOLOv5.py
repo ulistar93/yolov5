@@ -21,10 +21,11 @@ import pdb
 #class_name_to_id_mapping = {"Cigarette": 0,
 #                           "E_Cigarette": 1,
 #                           }
-class_name_to_id_mapping = {"bottle": 0,
-                            "cup": 1,
-                            "cell phone": 2,
-                            }
+#class_name_to_id_mapping = {"bottle": 0,
+#                            "cup": 1,
+#                            "cell phone": 2,
+#                            }
+class_name_to_id_mapping = {"cell phone": 0}
 
 
 # Load the dataset json
@@ -527,9 +528,11 @@ def gif_filter_main():
     coco_dataset.save_json_dict(annotation_path, annotation_fileName)
 
 def coco2yolo_main():
-    annotation_path = '../datasets/COCO17_PCB/'
-    annotation_fileName = "coco_pho_cup_bottle.json"
-    image_dir = '../datasets/COCO17_PCB'
+    annotation_path = '../datasets/COCO2017_PHONE/annotations/'
+    #annotation_fileName = "instances_train.json"
+    annotation_fileName = "instances_val.json"
+    #image_dir = '../datasets/COCO2017_PHONE/images/train'
+    image_dir = '../datasets/COCO2017_PHONE/images/val'
     data_type = "training"
 
     coco_dataset = CocoDataset(annotation_path + annotation_fileName, image_dir)
@@ -562,7 +565,7 @@ def gif_filter_only_delete_file():
 
 
 if __name__ == '__main__':
-    #coco2yolo_main()
-    displayCOCOimage()
+    coco2yolo_main()
+    #displayCOCOimage()
     # gif_filter_main()
     # gif_filter_only_delete_file()
