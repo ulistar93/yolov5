@@ -9,10 +9,12 @@ python train.py \
   --device 0 \
   --epochs 100 \
   --batch-size 16 \
-  --name SmokeFiltered
+  --workers 2 \
+  --name SmokeFiltered16
   #--data data/coco128.yaml \
   #--weights yolov5x.pt \
   #--workers 2 \
+  # 2022.03.31
 
   # 2022.03.29
   #--data data/coco2017phone.yaml \
