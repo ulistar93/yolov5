@@ -3,17 +3,24 @@
 source ~/torch1.8/bin/activate
 
 python train.py \
-  --data ./data/SmokeFiltered.yaml \
+  --data ./data/MDSM7+smoking+ddd.yaml \
   --weights yolov5l.pt \
   --hyp ./data/hyps/hyp.scratch-high.yaml \
   --device 0 \
   --epochs 100 \
   --batch-size 16 \
   --workers 2 \
-  --name SmokeFiltered16
-  #--data data/coco128.yaml \
-  #--weights yolov5x.pt \
+  --name MDSM7+smoking+ddd
+  # 2022.04.06
+
+  #--data ./data/SmokeFiltered.yaml \
+  #--weights yolov5l.pt \
+  #--hyp ./data/hyps/hyp.scratch-high.yaml \
+  #--device 0 \
+  #--epochs 100 \
+  #--batch-size 16 \
   #--workers 2 \
+  #--name SmokeFiltered16
   # 2022.03.31
 
   # 2022.03.29
