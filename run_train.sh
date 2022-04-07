@@ -5,12 +5,22 @@ source ~/torch1.8/bin/activate
 python train.py \
   --data ./data/MDSM7+smoking+ddd.yaml \
   --weights yolov5l.pt \
-  --hyp ./data/hyps/hyp.scratch-high.yaml \
+  --hyp ./data/hyps/hyp.m7smoddd.yaml \
   --device 0 \
   --epochs 100 \
   --batch-size 16 \
   --workers 2 \
-  --name MDSM7+smoking+ddd
+  --name MDSM7+smoking+ddd-lowaug
+  # 2022.04.07
+
+  #--data ./data/MDSM7+smoking+ddd.yaml \
+  #--weights yolov5l.pt \
+  #--hyp ./data/hyps/hyp.scratch-high.yaml \
+  #--device 0 \
+  #--epochs 100 \
+  #--batch-size 16 \
+  #--workers 2 \
+  #--name MDSM7+smoking+ddd
   # 2022.04.06
 
   #--data ./data/SmokeFiltered.yaml \
