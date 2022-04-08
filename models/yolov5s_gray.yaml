@@ -2,7 +2,7 @@
 
 # Parameters
 nc: 6  # number of classes
-ch: 3
+ch: 1
 depth_multiple: 0.33  # model depth multiple
 width_multiple: 0.50  # layer channel multiple
 anchors:

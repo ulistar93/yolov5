@@ -26,6 +26,7 @@ import yaml
 from PIL import ExifTags, Image, ImageOps
 from torch.utils.data import DataLoader, Dataset, dataloader, distributed
 from tqdm import tqdm
+import pdb
 
 from utils.augmentations import Albumentations, augment_hsv, copy_paste, letterbox, mixup, random_perspective
 from utils.general import (DATASETS_DIR, LOGGER, NUM_THREADS, check_dataset, check_requirements, check_yaml, clean_str,
@@ -94,7 +95,7 @@ def exif_transpose(image):
 
 
 def create_dataloader(path, imgsz, batch_size, stride, single_cls=False, hyp=None, augment=False, cache=False, pad=0.0,
-                      rect=False, rank=-1, workers=8, image_weights=False, quad=False, prefix='', shuffle=False):
+                      rect=False, rank=-1, workers=8, image_weights=False, quad=False, prefix='', shuffle=False, imgch=3):
     if rect and shuffle:
         LOGGER.warning('WARNING: --rect is incompatible with DataLoader shuffle, setting shuffle=False')
         shuffle = False
@@ -108,8 +109,9 @@ def create_dataloader(path, imgsz, batch_size, stride, single_cls=False, hyp=Non
                                       stride=int(stride),
                                       pad=pad,
                                       image_weights=image_weights,
-                                      prefix=prefix)
-
+                                      prefix=prefix,
+                                      imgch=imgch)
+    #pdb.set_trace()
     batch_size = min(batch_size, len(dataset))
     nd = torch.cuda.device_count()  # number of CUDA devices
     nw = min([os.cpu_count() // max(nd, 1), batch_size if batch_size > 1 else 0, workers])  # number of workers
@@ -382,7 +384,7 @@ class LoadImagesAndLabels(Dataset):
     cache_version = 0.6  # dataset labels *.cache version
 
     def __init__(self, path, img_size=640, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
-                 cache_images=False, single_cls=False, stride=32, pad=0.0, prefix=''):
+                 cache_images=False, single_cls=False, stride=32, pad=0.0, prefix='', imgch=3):
         self.img_size = img_size
         self.augment = augment
         self.hyp = hyp
@@ -393,6 +395,7 @@ class LoadImagesAndLabels(Dataset):
         self.stride = stride
         self.path = path
         self.albumentations = Albumentations() if augment else None
+        self.imgch = imgch
 
         try:
             f = []  # image files
@@ -616,10 +619,26 @@ class LoadImagesAndLabels(Dataset):
         if nl:
             labels_out[:, 1:] = torch.from_numpy(labels)
 
-        # Convert
-        img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
+        # Gray Scale
+        #print("** aug - img_type:%s "% str(type(img)) )
+        #print("** aug - img_shape:%s "% str(img.shape) )
+        #print("  0 &img=%x"%id(img))
+        if self.imgch == 1:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            #print("  1 &img=%x"%id(img))
+            img = np.expand_dims(img, axis=2)
+            #print("  2 &img=%x"%id(img))
+            # Convert
+            img = img.transpose((2, 0, 1))  # HWC to CHW
+            #print("  3 &img=%x"%id(img))
+        else: #self.imgch == 3
+            # Convert
+            img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
+            #print("  3 &img=%x"%id(img))
         img = np.ascontiguousarray(img)
-
+        #print("  4 &img=%x"%id(img))
+        #print("-- aug + img_type:%s "% str(type(img)) )
+        #print("-- aug + img_shape:%s "% str(img.shape) )
         return torch.from_numpy(img), labels_out, self.im_files[index], shapes
 
     def load_image(self, i):
