@@ -4,7 +4,7 @@ source ~/torch1.8/bin/activate
 
 python train.py \
   --data ./data/MDSM7+smoking+ddd-small.yaml \
-  --weights '' \
+  --weights ./yolov5s.pt \
   --cfg ./models/yolov5s_gray.yaml \
   --hyp ./data/hyps/hyp.m7smoddd.yaml \
   --device 0 \
@@ -12,7 +12,7 @@ python train.py \
   --batch-size 4 \
   --workers 2 \
   --imgsz 640 \
-  --name gray_test
+  --name gray_cfg_test 2>&1 | tee -a gray_cfg_test5.log
   #--exist-ok \
   #--weights yolov5s.pt \
   # 2022.04.07

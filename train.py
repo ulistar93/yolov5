@@ -123,8 +123,17 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             weights = attempt_download(weights)  # download if not found locally
         ckpt = torch.load(weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
         model = Model(cfg or ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
+        print("* pretrained model loading *")
+        if cfg and ckpt['model'].yaml:
+            print(" cfg.yaml and weight.pt both detected -> cfg.yaml get priority")
+        print("* pretrained model")
         print(model)
         exclude = ['anchor'] if (cfg or hyp.get('anchors')) and not resume else []  # exclude keys
+        cfg = cfg or ckpt['model'].yaml
+        if isinstance(cfg, str):
+            with open(Path(cfg).name, encoding='ascii', errors='ignore') as f:
+                cfg_yaml = yaml.safe_load(f)
+            cfg = cfg_yaml
         csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
         csd = intersect_dicts(csd, model.state_dict(), exclude=exclude)  # intersect
         model.load_state_dict(csd, strict=False)  # load
@@ -231,10 +240,10 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         LOGGER.info('Using SyncBatchNorm()')
 
     # Trainloader
-    #pdb.set_trace()
     if isinstance(cfg, dict):
         cfg_yaml = cfg
-    else:
+        # pretrained case also comes here
+    elif isinstance(cfg, str) and len(cfg):
         cfg_yaml_file = Path(cfg).name
         with open(cfg, encoding='ascii', errors='ignore') as f:
             cfg_yaml = yaml.safe_load(f)
