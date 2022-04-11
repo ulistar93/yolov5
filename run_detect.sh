@@ -4,13 +4,14 @@ source ~/torch1.8/bin/activate
 #export QT_LOGGING_RULES='*.debug=false;*.debug=false;qt.qpa.xcb.xcberror.warning=false;qt.qpa.xcb.xcberror.error=false;qt.qpa.xcb.warning=false;qt.qpa.xcb.error=false;qt.qpa.xcb=false'
 #export DISPLAY=:0.0
 python detect.py \
-  --weight runs/train/SmokeFiltered16/weights/best.pt \
+  --weight runs/train/MDSM7+smoking+ddd/weights/best.pt \
   --source /home/ycm/z/Vision/Datasets/MDSM/eval_dataSet/videos/ \
-  --data data/SmokeFiltered.yaml \
+  --data data/MDSM7+smoking+ddd.yaml \
   --device 0 \
   --conf-thres 0.6 \
   --iou-thres 0.3 \
-  --name SmokeFiltered16 \
+  --name m7smoddd \
+  # 2022.04.08
   #--exist-ok 
 
   #--save-txt \
