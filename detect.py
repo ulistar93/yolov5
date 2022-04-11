@@ -94,6 +94,10 @@ def run(
     model = DetectMultiBackend(weights, device=device, dnn=dnn, data=data, fp16=half)
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_img_size(imgsz, s=stride)  # check image size
+    #print("*********************")
+    #print("**[model arch]**")
+    #print(model)
+    #print("*********************")
 
     # Dataloader
     if webcam:
@@ -122,6 +126,11 @@ def run(
         # Inference
         visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if visualize else False
         pred = model(im, augment=augment, visualize=visualize)
+        #print("** im.shape")
+        #print(im.shape)
+        #print("** pred.shape")
+        #print(pred.shape)
+        #pdb.set_trace()
         t3 = time_sync()
         dt[1] += t3 - t2
 
