@@ -5,13 +5,15 @@ source ~/torch1.8/bin/activate
 #export DISPLAY=:0.0
 python detect.py \
   --weight runs/train/MDSM7+smoking+ddd/weights/best.pt \
-  --source /home/ycm/z/Vision/Datasets/MDSM/eval_dataSet/videos/ \
+  --source /home/ycm/eval_videos/ \
   --data data/MDSM7+smoking+ddd.yaml \
   --device 0 \
   --conf-thres 0.6 \
   --iou-thres 0.3 \
   --name m7smoddd \
-  # 2022.04.08
+  # 2022.04.11
+  #--weight runs/train/MDSM7+smoking+ddd-lowaug/weights/best.pt \
+  #--name m7smoddd-lowaug \
   #--exist-ok 
 
   #--weight runs/train/SmokeFiltered16/weights/best.pt \
