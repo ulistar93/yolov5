@@ -6,11 +6,11 @@ python train.py \
   --data ./data/MDSM7+smoking+ddd.yaml \
   --weights '' \
   --hyp ./data/hyps/hyp.m7smoddd.yaml \
-  --cfg ./models/yolov5n_gray.yaml \
+  --cfg ./models/yolov5s_gray.yaml \
   --device 0 \
   --epochs 100 \
-  --batch-size 16 \
-  --name MDSM7+smoking+ddd-gray_n
+  --batch-size 4 \
+  --name MDSM7+smoking+ddd-gray_s
   #--workers 4 \
   # 2022.04.11
 
