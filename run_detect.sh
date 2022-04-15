@@ -3,14 +3,36 @@
 source ~/torch1.8/bin/activate
 #export QT_LOGGING_RULES='*.debug=false;*.debug=false;qt.qpa.xcb.xcberror.warning=false;qt.qpa.xcb.xcberror.error=false;qt.qpa.xcb.warning=false;qt.qpa.xcb.error=false;qt.qpa.xcb=false'
 #export DISPLAY=:0.0
-python detect.py \
-  --weight runs/train/MDSM7+smoking+ddd/weights/best.pt \
-  --source /home/ycm/eval_videos/ \
-  --data data/MDSM7+smoking+ddd.yaml \
-  --device 0 \
-  --conf-thres 0.6 \
-  --iou-thres 0.3 \
-  --name m7smoddd \
+#vers="n s"
+imgszs="320 640"
+#for v in $vers
+for s in $imgszs
+do
+  python detect.py \
+    --weight runs/train/20220405_modeltest_yolov5n_180epch_batch_16_freeze0_PSR/weights/best.pt \
+    --source /home/ycm/eval_videos_short/ \
+    --data data/MDSM7+smoking+ddd.yaml \
+    --device cpu \
+    --imgsz $s \
+    --conf-thres 0.6 \
+    --iou-thres 0.3 \
+    --imgch 3 \
+    --half \
+    --name 20220405_modeltest_yolov5n_180epch_batch_16_freeze0_PSR_infertime_half
+    #--imgch 1 \
+    #--name m7smoddd-gray_fps_${v}
+    #--weight runs/train/MDSM7+smoking+ddd-gray_${v}/weights/best.pt \
+done
+  # 2022.04.12
+
+#python detect.py \
+  #--weight runs/train/MDSM7+smoking+ddd/weights/best.pt \
+  #--source /home/ycm/eval_videos/ \
+  #--data data/MDSM7+smoking+ddd.yaml \
+  #--device 0 \
+  #--conf-thres 0.6 \
+  #--iou-thres 0.3 \
+  #--name m7smoddd
   # 2022.04.11
   #--weight runs/train/MDSM7+smoking+ddd-lowaug/weights/best.pt \
   #--name m7smoddd-lowaug \

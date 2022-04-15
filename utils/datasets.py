@@ -128,7 +128,6 @@ def create_dataloader(path,
             image_weights=image_weights,
             prefix=prefix,
             imgch=imgch)
-    #pdb.set_trace()
     batch_size = min(batch_size, len(dataset))
     nd = torch.cuda.device_count()  # number of CUDA devices
     nw = min([os.cpu_count() // max(nd, 1), batch_size if batch_size > 1 else 0, workers])  # number of workers
@@ -179,7 +178,7 @@ class _RepeatSampler:
 
 class LoadImages:
     # YOLOv5 image/video dataloader, i.e. `python detect.py --source image.jpg/vid.mp4`
-    def __init__(self, path, img_size=640, stride=32, auto=True):
+    def __init__(self, path, img_size=640, stride=32, auto=True, imgch=3):
         p = str(Path(path).resolve())  # os-agnostic absolute path
         if '*' in p:
             files = sorted(glob.glob(p, recursive=True))  # glob
@@ -195,6 +194,7 @@ class LoadImages:
         ni, nv = len(images), len(videos)
 
         self.img_size = img_size
+        self.imgch = imgch
         self.stride = stride
         self.files = images + videos
         self.nf = ni + nv  # number of files
@@ -245,7 +245,12 @@ class LoadImages:
         img = letterbox(img0, self.img_size, stride=self.stride, auto=self.auto)[0]
 
         # Convert
-        img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
+        if self.imgch == 1:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img = np.expand_dims(img, axis=2)
+            img = img.transpose((2, 0, 1))  # HWC to CHW
+        else: #self.imgch == 3
+            img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         img = np.ascontiguousarray(img)
 
         return path, img, img0, self.cap, s
@@ -292,7 +297,12 @@ class LoadWebcam:  # for inference
         img = letterbox(img0, self.img_size, stride=self.stride)[0]
 
         # Convert
-        img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
+        if self.imgch == 1:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img = np.expand_dims(img, axis=2)
+            img = img.transpose((2, 0, 1))  # HWC to CHW
+        else: #self.imgch == 3
+            img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         img = np.ascontiguousarray(img)
 
         return img_path, img, img0, None, s
@@ -303,10 +313,11 @@ class LoadWebcam:  # for inference
 
 class LoadStreams:
     # YOLOv5 streamloader, i.e. `python detect.py --source 'rtsp://example.com/media.mp4'  # RTSP, RTMP, HTTP streams`
-    def __init__(self, sources='streams.txt', img_size=640, stride=32, auto=True):
+    def __init__(self, sources='streams.txt', img_size=640, stride=32, auto=True, imgch=3):
         self.mode = 'stream'
         self.img_size = img_size
         self.stride = stride
+        self.imgch = imgch # TODO
 
         if os.path.isfile(sources):
             with open(sources) as f:
