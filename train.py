@@ -131,15 +131,30 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
                 cfg_yaml = yaml.safe_load(f)
             cfg = cfg_yaml
         csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
-        pdb.set_trace()
-        csd = intersect_dicts(csd, model.state_dict(), exclude=exclude)  # intersect
-        model.load_state_dict(csd, strict=False)  # load
-        print("* pretrained load %s *" % weights)
+        #pdb.set_trace()
+        #print("csd['model.0.conv.weight'].shape = ", csd['model.0.conv.weight'].shape)
+        #print("csd['model.0.conv.weight'][0]")
+        #print(csd['model.0.conv.weight'][0])
+        #print()
+        #print("model.state_dict()['model.0.conv.weight'].shape =", model.state_dict()['model.0.conv.weight'].shape)
+        #print("model.state_dict()['model.0.conv.weight'][0]")
+        #print(model.state_dict()['model.0.conv.weight'][0])
+        #pdb.set_trace()
+        csd_in = intersect_dicts(csd, model.state_dict(), exclude=exclude)  # intersect
+        print(" (%d/%d) migrated from ckpt" % (len(csd_in.keys()), len(csd.keys())))
+        if len(csd_in.keys()) != len(csd.keys()):
+            print(" exclude: ")
+            print([x for x in csd.keys() if x not in csd_in.keys()])
+        model.load_state_dict(csd_in, strict=False)  # load
+        if opt.sum_conv0 and (cfg.get('ch') == 1) and (ckpt['model'].yaml.get('ch') == 3):
+            print("** sum conv0 weight from pt **")
+            bs, ch, k1, k2 = csd['model.0.conv.weight'].shape
+            conv0_w = {'model.0.conv.weight': torch.reshape(torch.sum(csd['model.0.conv.weight'],1), (bs, 1, k1, k2)) }
+            model.load_state_dict(conv0_w, strict=False)  # load
         print("** model weight print **")
-        #sd2 = model.state_dict()
-        #print("model.state_dict()[\'model.0.conv.weight\']'")
-        #print(sd2['model.0.conv.weight'].shape)
-        #print(sd2['model.0.conv.weight'])
+        #print("model.state_dict()['model.0.conv.weight'].shape =", model.state_dict()['model.0.conv.weight'].shape)
+        #print("model.state_dict()['model.0.conv.weight'][0]")
+        #print(model.state_dict()['model.0.conv.weight'][0])
         print(model.state_dict())
         print("************************")
         LOGGER.info(f'Transferred {len(csd)}/{len(model.state_dict())} items from {weights}')  # report
@@ -549,6 +564,7 @@ def parse_opt(known=False):
     parser.add_argument('--freeze', nargs='+', type=int, default=[0], help='Freeze layers: backbone=10, first3=0 1 2')
     parser.add_argument('--save-period', type=int, default=-1, help='Save checkpoint every x epochs (disabled if < 1)')
     parser.add_argument('--local_rank', type=int, default=-1, help='DDP parameter, do not modify')
+    parser.add_argument('--sum_conv0', action='store_true', help='sum conv0 weight from ckpt 3ch to cfg 1ch. only run when ckpt 3ch, cfg 1ch')
 
     # Weights & Biases arguments
     parser.add_argument('--entity', default=None, help='W&B: Entity')
