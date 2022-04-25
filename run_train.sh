@@ -2,17 +2,33 @@
 
 source ~/torch1.8/bin/activate
 
-python train.py \
-  --data ./data/MDSM7+smoking+ddd.yaml \
-  --weights '' \
-  --hyp ./data/hyps/hyp.m7smoddd.yaml \
-  --cfg ./models/yolov5n_gray.yaml \
-  --device 0 \
-  --imgsz 320 \
-  --batch-size 16 \
-  --workers 2 \
-  --epochs 300 \
-  --name MDSM7+smoking+ddd-gray_n_w8
+for isz in "320" "640"
+do
+  #echo python train.py \
+  python train.py \
+    --data ./data/MDSM7+smoking+ddd.yaml \
+    --weights ./yolov5n.pt \
+    --hyp ./data/hyps/hyp.m7smoddd.yaml \
+    --cfg ./models/yolov5n.yaml \
+    --imgsz ${isz} \
+    --device 0 \
+    --batch-size 16 \
+    --workers 2 \
+    --epochs 300 \
+    --name m7smoddd-rgb_${isz} 2>&1 | tee -a m7smoddd-rgb_${isz}.log
+done
+  # 2022.04.25
+
+  #--data ./data/MDSM7+smoking+ddd.yaml \
+  #--weights '' \
+  #--hyp ./data/hyps/hyp.m7smoddd.yaml \
+  #--cfg ./models/yolov5n_gray.yaml \
+  #--device 0 \
+  #--imgsz 320 \
+  #--batch-size 16 \
+  #--workers 2 \
+  #--epochs 300 \
+  #--name MDSM7+smoking+ddd-gray_n_w8
   #--cfg ./models/yolov5n.yaml \
   #--name MDSM7+smoking+ddd-rgb_n_nopt
   # 2022.04.15

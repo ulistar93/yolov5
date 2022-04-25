@@ -127,15 +127,19 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
         exclude = ['anchor'] if (cfg or hyp.get('anchors')) and not resume else []  # exclude keys
         cfg = cfg or ckpt['model'].yaml
         if isinstance(cfg, str):
-            with open(Path(cfg).name, encoding='ascii', errors='ignore') as f:
+            with open(Path(cfg), encoding='ascii', errors='ignore') as f:
                 cfg_yaml = yaml.safe_load(f)
             cfg = cfg_yaml
         csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
+        pdb.set_trace()
         csd = intersect_dicts(csd, model.state_dict(), exclude=exclude)  # intersect
         model.load_state_dict(csd, strict=False)  # load
-        #pdb.set_trace()
         print("* pretrained load %s *" % weights)
         print("** model weight print **")
+        #sd2 = model.state_dict()
+        #print("model.state_dict()[\'model.0.conv.weight\']'")
+        #print(sd2['model.0.conv.weight'].shape)
+        #print(sd2['model.0.conv.weight'])
         print(model.state_dict())
         print("************************")
         LOGGER.info(f'Transferred {len(csd)}/{len(model.state_dict())} items from {weights}')  # report
@@ -143,8 +147,13 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
         model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
         #pdb.set_trace()
         print("** model weight print **")
+        #sd2 = model.state_dict()
+        #print("model.state_dict()[\'model.0.conv.weight\']'")
+        #print(sd2['model.0.conv.weight'].shape)
+        #print(sd2['model.0.conv.weight'])
         print(model.state_dict())
         print("************************")
+    #pdb.set_trace()
 
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze
@@ -332,6 +341,7 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
                 f'Using {train_loader.num_workers * WORLD_SIZE} dataloader workers\n'
                 f"Logging results to {colorstr('bold', save_dir)}\n"
                 f'Starting training for {epochs} epochs...')
+    #pdb.set_trace()
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         model.train()
 
